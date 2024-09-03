@@ -15,18 +15,18 @@ def bfs(visited, q, n, m):
             nx = x + dx[i]
             ny = y + dy[i]
             #벽
-            if 0 <= nx < m and 0 <= ny < n:
-            # if 0 > nx or nx > m or 0 > ny or ny > n: continue
+            if 0 > nx or nx >= m or 0 > ny or ny >= n: continue
+            
             #다음 이동 위치(ny, nx)가 전 위치(y, x)의 값이
             # 이동해서 +1인 값보다 크면 (ny, nx)의 값이(ex: 무한대)거나
             # , 큰 값이면 작은 값 갱신
-                if visited[ny][nx] > visited[y][x]+1:
-                    visited[ny][nx] = visited[y][x]+1
-                    #처음 전체 물 위치 + 앞으로 완탐할 땅 위치 전부 큐에 추가해서
-                    #현재 +1해서 2인 위치라면 다음 +1 인 3인 땅을 체크해야 하기에 전부 추가
-                    q.append((ny, nx))
+            if visited[ny][nx] > visited[y][x]+1:
+                visited[ny][nx] = visited[y][x]+1
+                #처음 전체 물 위치 + 앞으로 완탐할 땅 위치 전부 큐에 추가해서
+                #현재 +1해서 2인 위치라면 다음 +1 인 3인 땅을 체크해야 하기에 전부 추가
+                q.append((ny, nx))
 
-    #
+    # 모든 visited 배열 값 전부 더해서 리턴값 반환
     move_sum = 0
     for vy in range(n):
         for vx in range(m):
@@ -56,4 +56,3 @@ for tc in range(1, t+1):
     result = bfs(visited, q, n, m)
 
     print(f"#{tc} {result}")
-
