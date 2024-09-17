@@ -1,32 +1,35 @@
 t = 10
 for tc in range(1, t+1):
-    #입력값, 한 줄로 들어오면 한개만 따로 빼고 뒤에는 리스트로 넣는 방법도 있다
-    # n, *line
-    line = list(input())
+    line = list(map(str, input().strip()))
 
-    split_line = []
+    # 문자열 입력 숫자만 받기
+    int_Line = []
     for i in range(len(line)):
         if line[i] == " ":
-            for s in range(i+1, len(line)):
-                split_line.append(line[s])
+            for j in range(i+1, len(line)):
+                int_Line.append(int(line[j]))
 
-    # print(split_line)
-
-    #pop 같은 번호 양쪽 팝하고 계속 다시 전부 양쪽에 있는지 체크 돌면서 완탐
-    #플래그 세워서 전부 무한 반복 돌다가 탈출
+    # 인접 숫자만 제거 위해 while문 한 번 돌면
+    # for 문 범위까진 한 번 반복함
+    # break 걸면 for 문 종료 -> while 조건 다시 체크
     flag = True
     while flag:
-        for i in range(len(split_line)):
-            flag = False
-            if i + 1 < len(split_line) and split_line[i] == split_line[i+1]:
+        for i in range(1, len(int_Line)):
+            # 일치하는 것 한 개 찾으면, flag 다시 True 로 바꾸고
+            # for 문 종료시키고 다시 돌기
+            if int_Line[i-1] == int_Line[i]:
+                # pop하면 인덱스 범위 달라짐
+                int_Line.pop(i-1)
+                # 다시 1단계 줄어든 인덱스 pop
+                int_Line.pop(i-1)
                 flag = True
-                split_line.pop(i)
-                split_line.pop(i)
                 break
-                
-    print(f"#{tc}", end=" ")
-    pwd = ''
-    for i in split_line:
-        pwd += i
-    print(pwd)
+            else:
+                # 일치하는게 없으면 for 문 종료 후
+                # while 문 탈출 조건
+                flag = False
 
+    print(f"#{tc}", end=" ")
+    for i in int_Line:
+        print(i, end="")
+    print()
