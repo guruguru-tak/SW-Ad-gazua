@@ -1,40 +1,48 @@
-
 t = int(input())
 
-dx = [1, 0, 0, -1]
-dy = [0, 1, -1, 0]
 
-def dfs(y, x):
-    #종료 조건?
+def dfs(y, x, cnt):
+    dx = [0, 1, -1, 0]
+    dy = [1, 0, 0, -1]
 
-    global cnt
+    for i in range(4):
+        ny, nx = y+dy[i], x+dx[i]
+        if ny < 0 or nx < 0 or ny >= n or nx >= n: continue
 
-    for dist in range(4):
-        ny, nx = y + dy[dist], x + dx[dist]
-        if 0 <= ny < n and 0 <= nx < n:
-            if(grid[y][x] + 1) == grid[ny][nx]:
-                cnt += 1
-                dfs(ny, nx)
+        # 인접 방이 정확히 1차이 나는지 비교
+        if grid[ny][nx] == grid[y][x] + 1:
+            # 1차이 나면 현재값 cnt 할당후 재귀
+            cnt = dfs(ny, nx, cnt+1)
+    # 차이나는 것 없으면 종료
+    return cnt
 
 
-for tc in range(1, t+1):
+for tc in range(1,t +1):
     n = int(input())
 
     grid = [list(map(int, input().split())) for _ in range(n)]
-    max_count = 0
-    start_idx = 0
+
+    # 최소 방 번호
+    min_Room_Num = 10**18
+
+    # cnt 움직일 횟수
+    max_Cnt = 0
 
 
-    #모든 y, x 탐색 필요
     for y in range(n):
         for x in range(n):
-            # 자기 자신을 포함해서 1 시작
-            cnt = 1
-            dfs(y, x)
 
-            if cnt > max_count or (cnt == max_count and grid[y][x] < start_idx):
-                start_idx = grid[y][x]
-                max_count = cnt
-    print(f"#{tc} {start_idx} {max_count}")
+            # - 1 씩 차이기에 방문처리 필요없음
+            room_Num = grid[y][x]
+            # 현재 위치에서 DFS 탐색
+            cnt = dfs(y, x, 1)
+            # 이동할 수 있는 방의 개수가 최대인 방이 여럿이라면 그 중에서 적힌 수가 가장 작은 것
+            # cnt 가 max보다 크면 갱신
+            if cnt > max_Cnt:
+                max_Cnt = cnt
+                min_Room_Num = room_Num
+            # max와 cnt 같으면 가장 작은 방 번호 보내주기
+            elif cnt == max_Cnt and room_Num < min_Room_Num:
+                min_Room_Num = room_Num
 
-
+    print(f"#{tc} {min_Room_Num} {max_Cnt}")
