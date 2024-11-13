@@ -1,39 +1,46 @@
-import heapq
+from collections import deque
 
-def min_recovery_cost(grid):
-    n = len(grid)
-    # 복구 비용을 저장할 2D 배열, 큰 값으로 초기화
-    recovery_cost = [[float('inf')] * n for _ in range(n)]
-    recovery_cost[0][0] = 0  # 시작점의 비용을 0으로 설정
-    
-    # 우선순위 큐 사용 (다익스트라 알고리즘)
-    queue = [(0, 0, 0)]  # (비용, x좌표, y좌표)
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # 상하좌우 이동
+t = int(input())
 
-    while queue:
-        cost, x, y = heapq.heappop(queue)
 
-        # 현재 위치의 비용이 기존 기록된 비용보다 크다면 무시
-        if cost > recovery_cost[x][y]:
-            continue
+def bfs(grid, n):
+    dx = [0, 1, -1, 0]
+    dy = [1, 0, 0, -1]
 
-        # 상하좌우 인접한 칸 탐색
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            # 범위 내에 있는지 확인
-            if 0 <= nx < n and 0 <= ny < n:
-                new_cost = cost + grid[nx][ny]
-                # 더 적은 비용으로 도달할 수 있으면 갱신
-                if new_cost < recovery_cost[nx][ny]:
-                    recovery_cost[nx][ny] = new_cost
-                    heapq.heappush(queue, (new_cost, nx, ny))
-                    
-    return recovery_cost[n - 1][n - 1]  # 우측 하단까지의 최소 복구 비용
+    # 최소비용을 기록할 벡터
+    time = [[10**18]*n for _ in range(n)]
+    # 시작점의 비용은 arr[0][0]
+    time[0][0] = grid[0][0]
 
-# 테스트 예제
-T = int(input())
-for test_case in range(1, T + 1):
+    # BFS를 위한 deque
+    # deque([ ]) -> 형식으로 iterable 형식으로 인자 받을 수 있다.
+    q = deque([(0, 0)])
+
+    while q:
+        y, x = q.popleft()
+        for i in range(4):
+            ny, nx = y+dy[i], x+dx[i]
+
+            if ny < 0 or nx < 0 or nx >= n or ny >= n: continue
+
+            new_time = time[y][x] + grid[ny][nx]
+
+            # 한칸 넘어갈 시간 보다 더 적은 비용으로 이동할 수 있을 때만 갱신
+            if new_time < time[ny][nx]:
+                time[ny][nx] = new_time
+                q.append((ny, nx))
+
+    # 목표 지점까지의 최소 비용 반환
+    return time[n-1][n-1]
+
+for tc in range(1, t+1):
     n = int(input())
+
     grid = [list(map(int, input().strip())) for _ in range(n)]
-    result = min_recovery_cost(grid)
-    print(f"#{test_case} {result}")
+
+    # print(grid)
+
+    # bfs를 이용하요 최소 비용 계산
+    result = bfs(grid, n)
+
+    print(f"#{tc} {result}")
