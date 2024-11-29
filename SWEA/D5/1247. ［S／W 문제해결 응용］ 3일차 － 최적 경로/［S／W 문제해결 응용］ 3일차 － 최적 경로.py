@@ -1,35 +1,51 @@
 from itertools import permutations
 
 t = int(input())
+
 for tc in range(1, t+1):
-    customer = int(input())
-    company_y, company_x, home_y, home_x, *customer_List = map(int, input().split())
+    n = int(input())
 
-    comp_list = []
-    # 출발지부터 다음 지점 y, x 좌표 뺀 다음 절대값의 합으로 비교해서 제일 최단 길로 가야함
-    # y, x 2차원 배열 만들기
-    for i in range(customer):
-        y = customer_List.pop(0)
-        x = customer_List.pop(0)
-        comp_list.append([y, x])
+    # 라인에서 처음 두개 회사 좌표, 집 좌표, N명의 고객 좌표
+    company_x, compay_y, home_x, home_y, *line = list(map(int, input().split()))
 
-    # 최단 경로를 계산할 변수
-    min_distance = 10**18
+    reline = []
+    for i in range(0, len(line), 2):
+        customer_x = line[i]
+        customer_y = line[i+1]
+        reline.append((customer_x, customer_y))
 
-    # 고객 방문 순서를 순열로 모두 탐색
-    for perm in permutations(comp_list):
-        # 먼저 회사에서 시작해서 고객 집까지 비교
-        temp_y, temp_x = company_y, company_x
-        total_distance = 0
+    # 최소값 찾기위해 맥스 값으로 초기화
+    min_result = 10**18
 
-        for y, x in perm:
-            total_distance += (abs(y - temp_y) + abs(x - temp_x))
-            temp_y, temp_x = y, x
 
-        # 마지막으로 고객집에서 본인집까지 집 계산
-        total_distance += (abs(home_y - temp_y) + abs(home_x - temp_x))
+    # 모두 탐색 -> 효율x -> 모두면 순열 뽑기
+    # 고객 수 10명 이내이기에
+    for perm in permutations(reline):
 
-        # 가장 짧은 경로 저장
-        min_distance = min(min_distance, total_distance)
+        # 매 순열 생성 하기에 초기화 값 만들기
+        result = 0
 
-    print(f"#{tc} {min_distance}")
+        # 먼저 회사에서 첫번째 고객 값 구하기
+        result = abs(company_x-perm[0][0]) + abs(compay_y-perm[0][1])
+
+        # 고객 집 전과 현재값 비교해서 결과값에 추가
+        for index in range(1, len(perm)):
+            # 이 조건문으로 1초 감소
+            if result < min_result:
+                result += abs(perm[index-1][0] - perm[index][0]) + abs(perm[index-1][1] - perm[index][1])
+            else:
+                break
+
+        # print(result)
+        # 마지막 집이랑 마지막 고객값 더하기
+        # 이 조건문으로 1초 감소
+        if result < min_result:
+            result += abs(perm[-1][0] - home_x) + abs(perm[-1][1] - home_y)
+        else:
+            continue
+
+        # 그리고 최소값 나올때까지 게속 마지막에 갱신
+        min_result = min(min_result, result)
+
+    print(f"#{tc} {min_result}")
+
