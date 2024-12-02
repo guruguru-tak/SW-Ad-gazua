@@ -1,51 +1,51 @@
 from itertools import permutations
 
-t = int(input())
+# 20초
+# 효율적으로 찾는 것이 목적이 아님
+# 고객 수 20 -> 완전 탐색 가능
+# 고객 집 한 번만 들려야 한다. -> 조합
 
+t = int(input())
 for tc in range(1, t+1):
+    # 고객 입력
     n = int(input())
 
-    # 라인에서 처음 두개 회사 좌표, 집 좌표, N명의 고객 좌표
-    company_x, compay_y, home_x, home_y, *line = list(map(int, input().split()))
+    # 회사, 집, 고객 좌표 입력
+    company_x, company_y, home_x, home_y, *line = list(map(int, input().split()))
 
-    reline = []
-    for i in range(0, len(line), 2):
-        customer_x = line[i]
-        customer_y = line[i+1]
-        reline.append((customer_x, customer_y))
+    result = 0
 
-    # 최소값 찾기위해 맥스 값으로 초기화
+    # (y ,x) 넣어서 다시 리스트 만들기
+    customer = []
+    for i in range(1, len(line), 2):
+        customer.append((line[i-1], line[i]))
+
+    # print(customer)
+
+    # 최소 경우 찾기 위해 10의 18승 지정
     min_result = 10**18
 
-
-    # 모두 탐색 -> 효율x -> 모두면 순열 뽑기
-    # 고객 수 10명 이내이기에
-    for perm in permutations(reline):
-
-        # 매 순열 생성 하기에 초기화 값 만들기
+    for perm in permutations(customer):
         result = 0
+        # 먼저 회사와 제일 처음 고객 집 좌표로 초기 값 넣어주기
+        result = abs(company_x - perm[0][0]) + abs(company_y - perm[0][1])
+        # print(result)
 
-        # 먼저 회사에서 첫번째 고객 값 구하기
-        result = abs(company_x-perm[0][0]) + abs(compay_y-perm[0][1])
-
-        # 고객 집 전과 현재값 비교해서 결과값에 추가
+        # y, x 두개 뽑기 위해 for 문 repeat 범위 2로 지정
         for index in range(1, len(perm)):
-            # 이 조건문으로 1초 감소
             if result < min_result:
-                result += abs(perm[index-1][0] - perm[index][0]) + abs(perm[index-1][1] - perm[index][1])
+                # 고객들간 경우 계산
+                customer_x = perm[index][0]
+                customer_y = perm[index][1]
+
+                result += abs(perm[index-1][0] - customer_x) + abs(perm[index-1][1] - customer_y)
             else:
                 break
 
-        # print(result)
-        # 마지막 집이랑 마지막 고객값 더하기
-        # 이 조건문으로 1초 감소
-        if result < min_result:
-            result += abs(perm[-1][0] - home_x) + abs(perm[-1][1] - home_y)
-        else:
-            continue
+        # 마지막 집과 집 거리 계산
+        result += abs(perm[-1][0] - home_x) + abs(perm[-1][1] - home_y)
 
-        # 그리고 최소값 나올때까지 게속 마지막에 갱신
+        # 최솟 값 갱신
         min_result = min(min_result, result)
 
     print(f"#{tc} {min_result}")
-
